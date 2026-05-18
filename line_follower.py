@@ -18,7 +18,7 @@ class LineFollower(Node):
         self.height = 120
 
         # ROI mas grande: ve mas adelante y mas ancho para anticipar curvas
-        self.roi_top = 0.35
+        self.roi_top = 0.15
         self.roi_bot = 0.90
         self.roi_left = 0.10
         self.roi_right = 0.90
@@ -119,3 +119,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
