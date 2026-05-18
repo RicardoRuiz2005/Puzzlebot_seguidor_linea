@@ -23,16 +23,16 @@ class LineFollower(Node):
         self.roi_left = 0.10
         self.roi_right = 0.90
 
-        # Adaptive threshold (se adapta a cualquier piso e iluminacion)
-        self.block_size = 25
-        self.c_offset = 12
+        # Threshold simple (mucho mas rapido que adaptive)
+        # Valores menores a thresh_val se vuelven blancos (la linea negra)
+        self.thresh_val = 80
 
         # Area minima (bajita para detectar lineas finas tipo plumon)
         self.min_area = 20
 
         # Suavizado del error
         self.error_filt = 0.0
-        self.alpha = 0.15  # cuanto pesa el error nuevo (mas bajo = mas suavizado)
+        self.alpha = 0.25  # cuanto pesa el error nuevo (mas bajo = mas suavizado)
 
         self.cv_img = None
 
@@ -62,13 +62,8 @@ class LineFollower(Node):
         gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        # Adaptive threshold (linea oscura queda blanca)
-        mask = cv2.adaptiveThreshold(
-            gray, 255,
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2.THRESH_BINARY_INV,
-            self.block_size, self.c_offset
-        )
+        # Threshold simple (linea oscura queda blanca)
+        _, mask = cv2.threshold(gray, self.thresh_val, 255, cv2.THRESH_BINARY_INV)
 
         # Solo dilatamos para reforzar la linea (sin erode para no borrar lineas delgadas)
         mask = cv2.dilate(mask, None, iterations=2)
